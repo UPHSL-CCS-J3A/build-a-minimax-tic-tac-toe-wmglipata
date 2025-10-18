@@ -1,3 +1,8 @@
+import random
+import time  # Added for delays
+
+# --- DISPLAY FUNCTIONS ---
+
 def print_board(board):
     """Display board in a 3x3 grid."""
     print("\n")
@@ -8,13 +13,8 @@ def print_board(board):
             print("---+---+---")
     print("\n")
 
-if __name__ == "__main__":  # quick test
-    board = [' '] * 9
-    print_board(board)
-
 # --- GAME RULES ---
 
-# All winning triplets (rows, columns, diagonals)
 LINES = [
     (0, 1, 2), (3, 4, 5), (6, 7, 8),
     (0, 3, 6), (1, 4, 7), (2, 5, 8),
@@ -36,13 +36,6 @@ def terminal(board):
     """True if the game is over (win or draw)."""
     return winner(board) is not None or not moves(board)
 
-if __name__ == "__main__":
-    b = ['X','X','X',' ',' ',' ',' ',' ',' ']
-    print_board(b)
-    print("Winner should be X ->", winner(b))
-    print("Moves available ->", moves(b))
-    print("Terminal? ->", terminal(b))
-
 def utility(board, me='O', opp='X'):
     """Score terminal states from AI perspective: +1 win, -1 loss, 0 draw."""
     w = winner(board)
@@ -58,14 +51,12 @@ def minimax(board, player, me='O', opp='X'):
     if terminal(board):
         return utility(board, me, opp), None
 
-    # Initialize best value depending on whose turn it is
     best_val = -2 if player == me else 2
     best_move = None
 
     for m in moves(board):
         b2 = board[:]
         b2[m] = player
-        # Switch turn: if player was me, next is opp; else me
         next_player = opp if player == me else me
         val, _ = minimax(b2, next_player, me, opp)
 
@@ -76,14 +67,7 @@ def minimax(board, player, me='O', opp='X'):
 
     return best_val, best_move
 
-if __name__ == "__main__":
-    # AI = 'O' to move, human = 'X'
-    board = ['X','O','X',
-             'O','X',' ',
-             ' ','O',' ']
-    print_board(board)
-    val, move = minimax(board, player='O', me='O', opp='X')
-    print("Minimax suggests move:", move, "with value:", val)
+# --- MAIN GAME LOOP ---
 
 def play_game():
     board = [' '] * 9
@@ -92,6 +76,8 @@ def play_game():
 
     print("Welcome to Tic-Tac-Toe (You are X, AI is O)")
     print_board(board)
+    time.sleep(1.5)  
+
     first = input("Do you want to go first? (y/n): ").strip().lower().startswith('y')
     current = human if first else ai
 
@@ -110,14 +96,19 @@ def play_game():
         else:
             # AI move
             print("AI is thinking...")
+            time.sleep(1.5)  
             _, m = minimax(board, player=ai, me=ai, opp=human)
             board[m] = ai
             print(f"AI chose position {m+1}")
 
         print_board(board)
+        time.sleep(1.5)  
         current = ai if current == human else human
 
+    # --- GAME END ---
     w = winner(board)
+    time.sleep(1.5)  
+
     if w == human:
         print("🎉 You win!")
     elif w == ai:
@@ -125,5 +116,6 @@ def play_game():
     else:
         print("😐 It's a draw!")
 
+# --- RUN GAME ---
 if __name__ == "__main__":
     play_game()
